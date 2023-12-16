@@ -130,15 +130,15 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('FlashTracker'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.generate(
-            5,
-            (index) => TimerButton(index: index),
+      body: Padding(
+        padding: EdgeInsets.only(top: 100, bottom: 50.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(
+              5,
+              (index) => TimerButton(index: index),
+            ),
           ),
         ),
       ),
