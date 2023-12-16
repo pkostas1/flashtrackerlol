@@ -82,8 +82,15 @@ class TimerButtonContent extends StatelessWidget {
           child: Container(
             width: 100.0,
             height: 100.0,
-            child: ClipRRect(
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15.0),
+              border: Border.all(
+                color: Colors.grey[400]!, // Set the border color
+                width: 3.0, // Set the border width
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12.0),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -130,6 +137,7 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       body: Padding(
         padding: EdgeInsets.only(top: 100, bottom: 50.0),
         child: Center(
