@@ -79,15 +79,21 @@ class TimerButtonContent extends StatelessWidget {
           onTap: () {
             BlocProvider.of<TimerCubit>(context).startStopTimer();
           },
+          splashColor: Colors.grey, // Color when tapped
+          borderRadius: BorderRadius.circular(15.0), // Set the border radius
           child: Container(
             width: 100.0,
             height: 100.0,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15.0),
-              border: Border.all(
-                color: Colors.grey[400]!, // Set the border color
-                width: 3.0, // Set the border width
-              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey[500]!, // Shadow color
+                  spreadRadius: 1,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12.0),
