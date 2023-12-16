@@ -18,7 +18,7 @@ class TimerCubit extends Cubit<int> {
       _timer = null;
       emit(0); // Reset timer
     } else {
-      emit(300); // Start timer with 5 minutes
+      emit(10); // TODO: change to start timer with 5 minutes
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
         if (state > 0) {
           emit(state - 1);
@@ -86,11 +86,11 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Timer App'),
+        title: const Text('FlashTracker'),
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: List.generate(
             5,
             (index) => TimerButton(index: index),
