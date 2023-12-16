@@ -47,19 +47,55 @@ class TimerButton extends StatelessWidget {
 }
 
 class TimerButtonContent extends StatelessWidget {
+  // Define the image path
+  static const String imagePath = 'assets/images/lol_flash_icon.png';
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TimerCubit, int>(
       builder: (context, timerState) {
-        return ElevatedButton(
-          onPressed: () {
+        return InkWell(
+          onTap: () {
             BlocProvider.of<TimerCubit>(context).startStopTimer();
           },
           child: Container(
             width: 100.0,
             height: 100.0,
             alignment: Alignment.center,
-            child: timerState > 0 ? CountdownTimer(timerState) : Text('Start'),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Initial image
+                Image.asset(
+                  imagePath,
+                  width: 100.0,
+                  height: 100.0,
+                  fit: BoxFit.contain,
+                ),
+
+                // Opacity filter for the image when timer is greater than 0
+                if (timerState > 0)
+                  ColorFiltered(
+                    colorFilter: ColorFilter.mode(
+                      Colors.grey
+                          .withOpacity(0.8), // Adjust the opacity as needed
+                      BlendMode.srcIn,
+                    ),
+                    child: Image.asset(
+                      imagePath,
+                      width: 100.0,
+                      height: 100.0,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+
+                // Visibility widget for timer text
+                Visibility(
+                  visible: timerState > 0,
+                  child: CountdownTimer(timerState),
+                ),
+              ],
+            ),
           ),
         );
       },
