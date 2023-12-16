@@ -7,27 +7,65 @@ void main() {
   runApp(MyApp());
 }
 
-class TimerCubit extends Cubit<int> {
+class TimerState {
+  final int time;
+  final bool isIBActive;
+  final bool isCIActive;
+
+  TimerState(this.time, this.isIBActive, this.isCIActive);
+
+  bool getIsActive(int toggleIndex) {
+    if (toggleIndex == 1) {
+      return isIBActive;
+    } else {
+      return isCIActive;
+    }
+  }
+}
+
+class TimerCubit extends Cubit<TimerState> {
   Timer? _timer;
 
-  TimerCubit() : super(0);
+  TimerCubit() : super(TimerState(0, false, false));
 
-  void startStopTimer(int duration) {
+  void startStopTimer() {
     if (_timer != null) {
       _timer!.cancel();
       _timer = null;
-      emit(0); // Reset timer
+      emit(TimerState(0, state.isIBActive,
+          state.isCIActive)); // Set timer to 0 when stopped
     } else {
-      emit(duration); // Start timer with 5 minutes
+      int initialTime = 300;
+      if (state.isCIActive && state.isIBActive) {
+        initialTime = 230;
+      } else if (state.isCIActive) {
+        initialTime = 254;
+      } else if (state.isIBActive) {
+        initialTime = 267;
+      }
+      emit(TimerState(initialTime, state.isIBActive,
+          state.isCIActive)); // Start timer with initial time
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-        if (state > 0) {
-          emit(state - 1);
+        if (state.time > 0) {
+          emit(TimerState(state.time - 1, state.isIBActive, state.isCIActive));
         } else {
           timer.cancel();
           _timer = null;
-          emit(0); // Reset timer
+          emit(TimerState(
+              0, false, false)); // Reset timer, but not the toggle buttons
         }
       });
+    }
+  }
+
+  void toggleButton(int index, int toggleIndex) {
+    TimerState currentState = state;
+    if (toggleIndex == 1) {
+      emit(TimerState(currentState.time, !currentState.isIBActive,
+          currentState.isCIActive));
+    } else {
+      emit(TimerState(currentState.time, currentState.isIBActive,
+          !currentState.isCIActive));
     }
   }
 }
@@ -42,28 +80,7 @@ class CountdownTimer extends StatelessWidget {
     int minutes = secondsRemaining ~/ 60;
     int seconds = secondsRemaining % 60;
 
-    return Text(
-      '$minutes:${seconds < 10 ? '0$seconds' : seconds}',
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 20.0,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
-}
-
-class TimerButton extends StatelessWidget {
-  final int index;
-
-  TimerButton({required this.index});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => TimerCubit(),
-      child: TimerButtonContent(index: index),
-    );
+    return Text('$minutes:${seconds < 10 ? '0$seconds' : seconds}');
   }
 }
 
@@ -77,34 +94,11 @@ class TimerButtonContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TimerCubit, int>(
+    return BlocBuilder<TimerCubit, TimerState>(
       builder: (context, timerState) {
-        int startingValue = 300; // Default starting value
-
-        // Get the state of the OpaqueButtons in the same row
-        List<bool> opaqueButtonStates = List.generate(
-          2,
-          (index) {
-            final opaqueButtonCubit = BlocProvider.of<OpaqueButtonCubit>(
-              context,
-              listen: false,
-            );
-            return opaqueButtonCubit.state;
-          },
-        );
-        print(opaqueButtonStates);
-        // Determine the starting value based on OpaqueButton states
-        if (opaqueButtonStates[0] && opaqueButtonStates[1]) {
-          startingValue = 230;
-        } else if (opaqueButtonStates[0]) {
-          startingValue = 267;
-        } else if (opaqueButtonStates[1]) {
-          startingValue = 254;
-        }
-
         return InkWell(
           onTap: () {
-            BlocProvider.of<TimerCubit>(context).startStopTimer(startingValue);
+            BlocProvider.of<TimerCubit>(context).startStopTimer();
           },
           splashColor: Colors.grey, // Color when tapped
           borderRadius: BorderRadius.circular(15.0), // Set the border radius
@@ -140,7 +134,7 @@ class TimerButtonContent extends StatelessWidget {
                   ),
 
                   // Opacity filter with darker blue hue when timer is greater than 0
-                  if (timerState > 0)
+                  if (timerState.time > 0)
                     ColorFiltered(
                       colorFilter: ColorFilter.mode(
                         const Color.fromARGB(255, 14, 86, 123).withOpacity(
@@ -157,8 +151,8 @@ class TimerButtonContent extends StatelessWidget {
 
                   // Visibility widget for timer text
                   Visibility(
-                    visible: timerState > 0,
-                    child: CountdownTimer(timerState),
+                    visible: timerState.time > 0,
+                    child: CountdownTimer(timerState.time),
                   ),
                 ],
               ),
@@ -170,43 +164,53 @@ class TimerButtonContent extends StatelessWidget {
   }
 }
 
-class OpaqueButton extends StatelessWidget {
+class TimerButton extends StatelessWidget {
   final int index;
-
-  OpaqueButton({required this.index});
+  TimerButton({required this.index});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => OpaqueButtonCubit(),
-      child: OpaqueButtonContent(index: index),
+      create: (context) => TimerCubit(),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          TimerButtonContent(
+            index: index,
+          ),
+          ToggleButton(index: index, toggleIndex: 1),
+          ToggleButton(index: index, toggleIndex: 2),
+        ],
+      ),
     );
   }
 }
 
-class OpaqueButtonCubit extends Cubit<bool> {
-  OpaqueButtonCubit() : super(false);
-
-  void toggleButton() {
-    emit(!state);
-  }
-}
-
-class OpaqueButtonContent extends StatelessWidget {
-  // Define the image path
+class ToggleButton extends StatelessWidget {
+  final int index;
+  final int toggleIndex;
   static const String imagePath = 'assets/images/lol_flash_icon.png';
 
-  final int index;
-
-  OpaqueButtonContent({required this.index});
+  ToggleButton({required this.index, required this.toggleIndex});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OpaqueButtonCubit, bool>(
-      builder: (context, isToggled) {
+    return BlocBuilder<TimerCubit, TimerState>(
+      builder: (context, timerState)
+          // {
+          //   return IconButton(
+          //     icon: Icon(timerState.getToggleIcon(toggleIndex)),
+          //     onPressed: () {
+          //       BlocProvider.of<TimerCubit>(context)
+          //           .toggleButton(index, toggleIndex);
+          //     },
+          //   );
+          // },
+          {
         return InkWell(
           onTap: () {
-            BlocProvider.of<OpaqueButtonCubit>(context).toggleButton();
+            BlocProvider.of<TimerCubit>(context)
+                .toggleButton(index, toggleIndex);
           },
           splashColor: Colors.grey,
           borderRadius: BorderRadius.circular(15.0),
@@ -223,7 +227,9 @@ class OpaqueButtonContent extends StatelessWidget {
                   offset: const Offset(0, 2),
                 ),
               ],
-              color: isToggled ? Colors.grey[400] : Colors.transparent,
+              color: timerState.getIsActive(toggleIndex)
+                  ? Colors.grey[400]
+                  : Colors.transparent,
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12.0),
@@ -239,7 +245,7 @@ class OpaqueButtonContent extends StatelessWidget {
                   ),
 
                   // Opacity filter when the button is toggled
-                  if (isToggled)
+                  if (timerState.getIsActive(toggleIndex))
                     ColorFiltered(
                       colorFilter: ColorFilter.mode(
                         Colors.grey.withOpacity(0.8),
@@ -274,20 +280,7 @@ class MyHomePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(
               5,
-              (rowIndex) => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  TimerButton(index: rowIndex),
-                  BlocProvider(
-                    create: (context) => OpaqueButtonCubit(),
-                    child: OpaqueButton(index: rowIndex),
-                  ),
-                  BlocProvider(
-                    create: (context) => OpaqueButtonCubit(),
-                    child: OpaqueButton(index: rowIndex + 5),
-                  ),
-                ],
-              ),
+              (rowIndex) => TimerButton(index: rowIndex),
             ),
           ),
         ),
@@ -303,9 +296,6 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<TimerCubit>(
           create: (context) => TimerCubit(),
-        ),
-        BlocProvider<OpaqueButtonCubit>(
-          create: (context) => OpaqueButtonCubit(),
         ),
       ],
       child: MaterialApp(
