@@ -80,7 +80,13 @@ class CountdownTimer extends StatelessWidget {
     int minutes = secondsRemaining ~/ 60;
     int seconds = secondsRemaining % 60;
 
-    return Text('$minutes:${seconds < 10 ? '0$seconds' : seconds}');
+    return Text(
+      '$minutes:${seconds < 10 ? '0$seconds' : seconds}',
+      style: TextStyle(
+        fontSize: 24.0, // Change the font size as needed
+        color: Colors.white, // Change the text color to white
+      ),
+    );
   }
 }
 
@@ -107,10 +113,6 @@ class TimerButtonContent extends StatelessWidget {
             height: 100.0,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15.0),
-              border: Border.all(
-                color: Colors.grey[400]!,
-                width: 3.0,
-              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey[500]!, // Shadow color
@@ -137,7 +139,7 @@ class TimerButtonContent extends StatelessWidget {
                   if (timerState.time > 0)
                     ColorFiltered(
                       colorFilter: ColorFilter.mode(
-                        const Color.fromARGB(255, 14, 86, 123).withOpacity(
+                        const Color.fromARGB(95, 158, 158, 158).withOpacity(
                             0.90), // Adjust the opacity and color as needed
                         BlendMode.srcIn,
                       ),
@@ -178,8 +180,15 @@ class TimerButton extends StatelessWidget {
           TimerButtonContent(
             index: index,
           ),
-          ToggleButton(index: index, toggleIndex: 1),
-          ToggleButton(index: index, toggleIndex: 2),
+          ToggleButton(
+              index: index,
+              toggleIndex: 1,
+              imagePath: 'assets/images/lucidity_boots_icon.png'),
+          ToggleButton(
+            index: index,
+            toggleIndex: 2,
+            imagePath: 'assets/images/lol_cosmic_insight_icon.png',
+          ),
         ],
       ),
     );
@@ -189,24 +198,20 @@ class TimerButton extends StatelessWidget {
 class ToggleButton extends StatelessWidget {
   final int index;
   final int toggleIndex;
-  static const String imagePath = 'assets/images/lol_flash_icon.png';
+  final String imagePath;
 
-  ToggleButton({required this.index, required this.toggleIndex});
+  ToggleButton(
+      {required this.index,
+      required this.toggleIndex,
+      required this.imagePath});
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TimerCubit, TimerState>(
-      builder: (context, timerState)
-          // {
-          //   return IconButton(
-          //     icon: Icon(timerState.getToggleIcon(toggleIndex)),
-          //     onPressed: () {
-          //       BlocProvider.of<TimerCubit>(context)
-          //           .toggleButton(index, toggleIndex);
-          //     },
-          //   );
-          // },
-          {
+      builder: (context, timerState) {
+        const double width = 40.0;
+        const double height = 40.0;
+
         return InkWell(
           onTap: () {
             BlocProvider.of<TimerCubit>(context)
@@ -215,8 +220,8 @@ class ToggleButton extends StatelessWidget {
           splashColor: Colors.grey,
           borderRadius: BorderRadius.circular(15.0),
           child: Container(
-            width: 100.0,
-            height: 100.0,
+            width: width,
+            height: height,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15.0),
               boxShadow: [
@@ -239,22 +244,22 @@ class ToggleButton extends StatelessWidget {
                   // Initial image
                   Image.asset(
                     imagePath,
-                    width: 100.0,
-                    height: 100.0,
+                    width: width,
+                    height: height,
                     fit: BoxFit.cover,
                   ),
 
                   // Opacity filter when the button is toggled
-                  if (timerState.getIsActive(toggleIndex))
+                  if (!timerState.getIsActive(toggleIndex))
                     ColorFiltered(
                       colorFilter: ColorFilter.mode(
-                        Colors.grey.withOpacity(0.8),
+                        Colors.grey.withOpacity(0.9),
                         BlendMode.srcIn,
                       ),
                       child: Image.asset(
                         imagePath,
-                        width: 100.0,
-                        height: 100.0,
+                        width: width,
+                        height: height,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -274,7 +279,8 @@ class MyHomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       body: Padding(
-        padding: EdgeInsets.only(top: 100, bottom: 50.0),
+        padding:
+            EdgeInsets.only(top: 100, bottom: 50.0, left: 50.0, right: 50.0),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
