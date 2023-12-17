@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:flash_track/main.dart';
+import 'package:flash_tracker/main.dart';
 
 void main() {
   testWidgets('', (WidgetTester tester) async {});

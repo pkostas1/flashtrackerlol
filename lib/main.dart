@@ -289,9 +289,45 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
+      appBar: AppBar(
+        backgroundColor: Colors.grey[200],
+        title: const Text(
+          'FlashTracker',
+          style: TextStyle(
+            fontFamily: 'Futura',
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        // centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info),
+            onPressed: () {
+              // Add your logic for the info button here
+              // For example, you can show a dialog or navigate to an info screen
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('How to: FlashTracker'),
+                  content: const Text(
+                      "Welcome to FlashTracker! \n\nThis app was built to help you track the enemy team's flash cooldowns in League of Legends.  To use it, just tap the Flash icon for the corresponding role when you see them use flash. \n\n In addition, you can tap the Cosmic Insight and Ionian Boots icons for each role if they have either rune/item for a more accurate Flash cooldown timer."),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Close'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       body: const Padding(
         padding:
-            EdgeInsets.only(top: 100, bottom: 50.0, left: 15.0, right: 15.0),
+            EdgeInsets.only(top: 25, bottom: 50.0, left: 15.0, right: 15.0),
         child: Center(
           child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -324,7 +360,7 @@ class MyApp extends StatelessWidget {
           create: (context) => TimerCubit(),
         ),
       ],
-      child: MaterialApp(
+      child: const MaterialApp(
         home: MyHomePage(),
       ),
     );
