@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class TimerState {
@@ -45,7 +45,7 @@ class TimerCubit extends Cubit<TimerState> {
       }
       emit(TimerState(initialTime, state.isIBActive,
           state.isCIActive)); // Start timer with initial time
-      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (state.time > 0) {
           emit(TimerState(state.time - 1, state.isIBActive, state.isCIActive));
         } else {
@@ -73,7 +73,7 @@ class TimerCubit extends Cubit<TimerState> {
 class CountdownTimer extends StatelessWidget {
   final int secondsRemaining;
 
-  CountdownTimer(this.secondsRemaining);
+  CountdownTimer(this.secondsRemaining, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +82,7 @@ class CountdownTimer extends StatelessWidget {
 
     return Text(
       '$minutes:${seconds < 10 ? '0$seconds' : seconds}',
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 24.0, // Change the font size as needed
         color: Colors.white, // Change the text color to white
       ),
@@ -96,7 +96,7 @@ class TimerButtonContent extends StatelessWidget {
 
   final int index;
 
-  TimerButtonContent({required this.index});
+  const TimerButtonContent({super.key, required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -106,11 +106,12 @@ class TimerButtonContent extends StatelessWidget {
           onTap: () {
             BlocProvider.of<TimerCubit>(context).startStopTimer();
           },
-          splashColor: Colors.grey, // Color when tapped
+          // splashColor: Colors.grey, // Color when tapped
           borderRadius: BorderRadius.circular(15.0), // Set the border radius
           child: Container(
             width: 100.0,
             height: 100.0,
+            // margin: const EdgeInsets.only(left: 20.0, right: 10.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15.0),
               boxShadow: [
@@ -118,7 +119,7 @@ class TimerButtonContent extends StatelessWidget {
                   color: Colors.grey[500]!, // Shadow color
                   spreadRadius: 1,
                   blurRadius: 4,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -139,8 +140,8 @@ class TimerButtonContent extends StatelessWidget {
                   if (timerState.time > 0)
                     ColorFiltered(
                       colorFilter: ColorFilter.mode(
-                        const Color.fromARGB(95, 158, 158, 158).withOpacity(
-                            0.90), // Adjust the opacity and color as needed
+                        Colors.black.withOpacity(
+                            0.7), // Adjust the opacity and color as needed
                         BlendMode.srcIn,
                       ),
                       child: Image.asset(
@@ -150,7 +151,6 @@ class TimerButtonContent extends StatelessWidget {
                         fit: BoxFit.cover,
                       ),
                     ),
-
                   // Visibility widget for timer text
                   Visibility(
                     visible: timerState.time > 0,
@@ -168,7 +168,9 @@ class TimerButtonContent extends StatelessWidget {
 
 class TimerButton extends StatelessWidget {
   final int index;
-  TimerButton({required this.index});
+  final String laneIconPath;
+  const TimerButton(
+      {super.key, required this.index, required this.laneIconPath});
 
   @override
   Widget build(BuildContext context) {
@@ -177,6 +179,12 @@ class TimerButton extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
+          Image.asset(
+            laneIconPath,
+            width: 80.0,
+            height: 80.0,
+            fit: BoxFit.cover,
+          ),
           TimerButtonContent(
             index: index,
           ),
@@ -200,8 +208,9 @@ class ToggleButton extends StatelessWidget {
   final int toggleIndex;
   final String imagePath;
 
-  ToggleButton(
-      {required this.index,
+  const ToggleButton(
+      {super.key,
+      required this.index,
       required this.toggleIndex,
       required this.imagePath});
 
@@ -209,8 +218,8 @@ class ToggleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<TimerCubit, TimerState>(
       builder: (context, timerState) {
-        const double width = 40.0;
-        const double height = 40.0;
+        const double width = 60.0;
+        const double height = 60.0;
 
         return InkWell(
           onTap: () {
@@ -218,12 +227,12 @@ class ToggleButton extends StatelessWidget {
                 .toggleButton(index, toggleIndex);
           },
           splashColor: Colors.grey,
-          borderRadius: BorderRadius.circular(15.0),
+          borderRadius: BorderRadius.circular(30.0),
           child: Container(
             width: width,
             height: height,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15.0),
+              borderRadius: BorderRadius.circular(30.0),
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey[500]!,
@@ -237,7 +246,7 @@ class ToggleButton extends StatelessWidget {
                   : Colors.transparent,
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(12.0),
+              borderRadius: BorderRadius.circular(20.0),
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -274,21 +283,30 @@ class ToggleButton extends StatelessWidget {
 }
 
 class MyHomePage extends StatelessWidget {
+  const MyHomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      body: Padding(
+      body: const Padding(
         padding:
-            EdgeInsets.only(top: 100, bottom: 50.0, left: 50.0, right: 50.0),
+            EdgeInsets.only(top: 100, bottom: 50.0, left: 15.0, right: 15.0),
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: List.generate(
-              5,
-              (rowIndex) => TimerButton(index: rowIndex),
-            ),
-          ),
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TimerButton(
+                    index: 0, laneIconPath: 'assets/images/top_icon.png'),
+                TimerButton(
+                    index: 0, laneIconPath: 'assets/images/jungle_icon.png'),
+                TimerButton(
+                    index: 0, laneIconPath: 'assets/images/mid_icon.png'),
+                TimerButton(
+                    index: 0, laneIconPath: 'assets/images/bot_icon.png'),
+                TimerButton(
+                    index: 0, laneIconPath: 'assets/images/support_icon.png'),
+              ]),
         ),
       ),
     );
@@ -296,6 +314,8 @@ class MyHomePage extends StatelessWidget {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
