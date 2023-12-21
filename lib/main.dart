@@ -310,7 +310,7 @@ class MyHomePage extends StatelessWidget {
                 builder: (context) => AlertDialog(
                   title: const Text('How to: FlashTracker'),
                   content: const Text(
-                      "Welcome to FlashTracker! \n\nThis app was built to help you track the enemy team's flash cooldowns in League of Legends.  To use it, just tap the Flash icon for the corresponding role when you see them use flash. \n\n In addition, you can tap the Cosmic Insight and Ionian Boots icons for each role if they have either rune/item for a more accurate Flash cooldown timer. \n\nSend feedback to @kosiikos on Twitter! "),
+                      "Welcome to FlashTracker! \n\nThis app was built to help you track the enemy team's flash cooldowns in League of Legends.  To use it, just tap the Flash icon for the corresponding role when you see them use flash. \n\n In addition, you can tap the Cosmic Insight and Ionian Boots icons for each role if they have either rune/item for a more accurate Flash cooldown timer. \n\nSend feedback to @kosiikoslabs on Twitter! "),
                   actions: [
                     TextButton(
                       onPressed: () {
