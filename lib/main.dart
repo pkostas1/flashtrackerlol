@@ -362,6 +362,7 @@ class MyApp extends StatelessWidget {
       ],
       child: const MaterialApp(
         home: MyHomePage(),
+        debugShowCheckedModeBanner: false,
       ),
     );
   }
